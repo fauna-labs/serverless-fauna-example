@@ -1,24 +1,6 @@
-# Welcome to Serverless!
-#
-# This file is the main config file for your service.
-# It's very minimal at this point and uses default values.
-# You can always add more config options for more control.
-# We've included some commented out config examples here.
-# Just uncomment any of them to get that config option.
-#
-# For full config options, check the docs:
-#    docs.serverless.com
-#
-# Happy Coding!
-
 service: serverless-fauna-example
-# app and org for use with dashboard.serverless.com
 app: serverless-fauna-example
 org: fireridlle
-
-# You can pin your service to only deploy with a specific Serverless version
-# Check out our docs for more details
-# frameworkVersion: "=X.X.X"
 
 provider:
   name: aws
@@ -30,39 +12,6 @@ provider:
     # FAUNA_SCHEME: https
     # FAUNA_PORT: 443
 
-# you can overwrite defaults here
-#  stage: dev
-#  region: us-east-1
-
-# you can add statements to the Lambda function's IAM Role here
-#  iamRoleStatements:
-#    - Effect: "Allow"
-#      Action:
-#        - "s3:ListBucket"
-#      Resource: { "Fn::Join" : ["", ["arn:aws:s3:::", { "Ref" : "ServerlessDeploymentBucket" } ] ]  }
-#    - Effect: "Allow"
-#      Action:
-#        - "s3:PutObject"
-#      Resource:
-#        Fn::Join:
-#          - ""
-#          - - "arn:aws:s3:::"
-#            - "Ref" : "ServerlessDeploymentBucket"
-#            - "/*"
-
-# you can define service wide environment variables here
-#  environment:
-#    variable1: value1
-
-# you can add packaging information here
-#package:
-#  include:
-#    - include-me.js
-#    - include-me-dir/**
-#  exclude:
-#    - exclude-me.js
-#    - exclude-me-dir/**
-
 plugins:
   - serverless-fauna
 functions:
@@ -70,44 +19,44 @@ functions:
     handler: handler.hello
 
 fauna:
-    collections:
-      Movies: 
-        # can accept any param that accept CreateCollection query. 
-        # Read more https://docs.fauna.com/fauna/current/api/fql/functions/createcollection?lang=javascript#param_object
-        # name: Movies
-        name: Movies
-        data: 
-          test: 2
+  collections:
+    Movies: 
+      # can accept any param that accept CreateCollection query. 
+      # Read more https://docs.fauna.com/fauna/current/api/fql/functions/createcollection?lang=javascript#param_object
+      # name: Movies
+      name: Movies
+      data: 
+        test: 2
 
-    indexes:
-      movies_by_type:
-        # can accept any param that accept CreateIndex query except source.fields
-        # Read more https://docs.fauna.com/fauna/current/api/fql/functions/createindex?lang=javascript#param_object
-        name: movies_by_type
-        source: ${self:fauna.collections.Movies.name}
-        terms:
-          fields: 
-            - data.type
+  indexes:
+    movies_by_type:
+      # can accept any param that accept CreateIndex query except source.fields
+      # Read more https://docs.fauna.com/fauna/current/api/fql/functions/createindex?lang=javascript#param_object
+      name: movies_by_type
+      source: ${self:fauna.collections.Movies.name}
+      terms:
+        fields: 
+          - data.type
 
-      movies_by_category:
-        name: movies_by_category
-        source: ${self:fauna.collections.Movies.name}
-        data:
-          test: test12
-        terms:
-          fields: 
-            - data.category
+    movies_by_category:
+      name: movies_by_category
+      source: ${self:fauna.collections.Movies.name}
+      data:
+        test: test12
+      terms:
+        fields: 
+          - data.category
 
-      sort_by_year:
-        name: sort_by_year
-        source: 
-          collection: ${self:fauna.collections.Movies.name}
-          fields:
-            this_year_release: ${file(./IsMovieReleasedCurrentYear.fql)}
-        values:
-          fields:
-            - path: data.type
-              reverse: true
-            - ref
-          bindings:
-            - this_year_release
+    sort_by_year:
+      name: sort_by_year
+      source: 
+        collection: ${self:fauna.collections.Movies.name}
+        fields:
+          this_year_release: ${file(./IsMovieReleasedCurrentYear.fql)}
+      values:
+        fields:
+          - path: data.type
+            reverse: true
+          - ref
+        bindings:
+          - this_year_release
