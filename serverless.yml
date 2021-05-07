@@ -28,6 +28,11 @@ fauna:
       data: 
         test: 2
 
+  functions:
+    double:
+      name: double
+      body: ${file('./double.fql')}
+
   indexes:
     movies_by_type:
       # can accept any param that accept CreateIndex query except source.fields
