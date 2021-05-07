@@ -1,0 +1,4 @@
+Equals([
+  Year(Now()),
+  ToInteger(Select(['data', 'release_year'], Var('doc')))
+])
