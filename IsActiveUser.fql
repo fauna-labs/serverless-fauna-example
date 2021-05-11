@@ -1,0 +1,1 @@
+Lambda("ref", Select(["data", "is_active"], Get(Var("ref"))))

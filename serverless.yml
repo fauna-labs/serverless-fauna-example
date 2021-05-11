@@ -1,61 +1,81 @@
 service: serverless-fauna-example
 app: serverless-fauna-example
 org: fireridlle
+configValidationMode: error
 
 provider:
   name: aws
   runtime: nodejs12.x
   lambdaHashingVersion: 20201221
-  environment:
-    FAUNA_ROOT_KEY: ${env:FAUNA_ROOT_KEY}
-    # FAUNA_DOMAIN: db.fauna.com
-    # FAUNA_SCHEME: https
-    # FAUNA_PORT: 443
 
 plugins:
   - serverless-fauna
 functions:
   hello:
     handler: handler.hello
+  # environment:
+  #   FAUNA_COLLECTION: ${self:fauna.collections.Measurements.name}
+
 
 fauna:
+  client:
+    secret: ${env:FAUNA_ROOT_KEY}
+    # domain: db.fauna.com
+    # port: 433
+    # scheme: https
   collections:
-    Movies: 
+    movies: 
       # can accept any param that accept CreateCollection query. 
       # Read more https://docs.fauna.com/fauna/current/api/fql/functions/createcollection?lang=javascript#param_object
       # name: Movies
-      name: Movies
+      name: movies
       data: 
-        test: 2
+        new_key: new_value
+        up: up
+
+    scriptwriters:
+      name: scriptwriters
+
+    directors:
+      name: directors
+
+    users:
+      name: users
 
   functions:
     double:
       name: double
       body: ${file('./double.fql')}
+      # role: ${self:fauna.roles.movies_reader.name}
+      data:
+        up: new_value
 
   indexes:
     movies_by_type:
       # can accept any param that accept CreateIndex query except source.fields
       # Read more https://docs.fauna.com/fauna/current/api/fql/functions/createindex?lang=javascript#param_object
       name: movies_by_type
-      source: ${self:fauna.collections.Movies.name}
+      source: ${self:fauna.collections.movies.name}
       terms:
         fields: 
           - data.type
 
     movies_by_category:
       name: movies_by_category
-      source: ${self:fauna.collections.Movies.name}
+      source: ${self:fauna.collections.movies.name}
       data:
-        test: test12
+        test: test123
       terms:
         fields: 
           - data.category
 
     sort_by_year:
       name: sort_by_year
+      data:
+        my: erer
+        # deletion_policy: true
       source: 
-        collection: ${self:fauna.collections.Movies.name}
+        collection: ${self:fauna.collections.movies.name}
         fields:
           this_year_release: ${file(./IsMovieReleasedCurrentYear.fql)}
       values:
@@ -65,3 +85,35 @@ fauna:
           - ref
         bindings:
           - this_year_release
+  roles:
+    movies_reader:
+      # can accept any param that accept CreateRole query except source.fields
+      # Read more https://docs.fauna.com/fauna/current/api/fql/functions/createrole?lang=javascript
+      name: movies_reader
+      membership:
+        resource: ${self:fauna.collections.users.name}
+        predicate: ${file(./IsActiveUser.fql)}
+      privileges:
+        - collection: ${self:fauna.collections.movies.name}
+          actions:
+            read: true
+        - index: ${self:fauna.indexes.movies_by_type.name}
+          actions:
+            read: true
+        - index: ${self:fauna.indexes.movies_by_category.name}
+          actions:
+            read: true
+        - index: ${self:fauna.indexes.sort_by_year.name}
+          actions:
+            read: true
+
+    editors:
+      name: editors
+      membership:
+        - ${self:fauna.collections.scriptwriters.name}
+        - ${self:fauna.collections.directors.name}
+      privileges:
+        - collection: ${self:fauna.collections.movies.name}
+          actions:
+            read: true
+            write: ${file(./CanModifyMovie.fql)}

@@ -1,0 +1,7 @@
+Lambda(
+  ["oldData"],
+  Or(
+    Equals(CurrentIdentity(), Select(["data", "director"], Get(Var("oldData")))),
+    Equals(CurrentIdentity(), Select(["data", "scriptwriters"], Get(Var("oldData"))))
+  )
+)
