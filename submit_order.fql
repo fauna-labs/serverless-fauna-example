@@ -1,0 +1,118 @@
+
+Lambda(
+    ["customerId", "products"],
+    Let(
+      {
+        customer: Get(Ref(Collection("customers"), Var("customerId"))),
+        products: Map(
+          Var("products"),
+          Lambda(
+            "requestedProduct",
+            Let(
+              {
+                product: Get(
+                  Ref(
+                    Collection("products"),
+                    Select("productId", Var("requestedProduct"))
+                  )
+                )
+              },
+              {
+                ref: Select("ref", Var("product")),
+                price: Select(["data", "price"], Var("product")),
+                currentQuantity: Select(["data", "quantity"], Var("product")),
+                requestedQuantity: Select(
+                  ["quantity"],
+                  Var("requestedProduct")
+                ),
+                backorderLimit: Select(
+                  ["data", "backorderLimit"],
+                  Var("product")
+                )
+              }
+            )
+          )
+        )
+      },
+      Do(
+        Foreach(
+          Var("products"),
+          Lambda(
+            "product",
+            If(
+              LTE(
+                Select("requestedQuantity", Var("product")),
+                Select("currentQuantity", Var("product"))
+              ),
+              Var("product"),
+              Abort(
+                Concat([
+                  "Stock quantity for Product [",
+                  Select(["ref", "id"], Var("product")),
+                  "] not enough – requested at [",
+                  ToString(Time("now")),
+                  "]"
+                ])
+              )
+            )
+          )
+        ),
+        Foreach(
+          Var("products"),
+          Lambda(
+            "product",
+            Update(Select("ref", Var("product")), {
+              data: {
+                quantity: Subtract(
+                  Select("currentQuantity", Var("product")),
+                  Select("requestedQuantity", Var("product"))
+                )
+              }
+            })
+          )
+        ),
+        Foreach(
+          Var("products"),
+          Lambda(
+            "product",
+            If(
+              LTE(
+                Subtract(
+                  Select("currentQuantity", Var("product")),
+                  Select("requestedQuantity", Var("product"))
+                ),
+                Select("backorderLimit", Var("product"))
+              ),
+              Update(Select("ref", Var("product")), {
+                data: { backordered: true }
+              }),
+              Var("product")
+            )
+          )
+        ),
+        Let(
+          {
+            shoppingCart: Map(
+              Var("products"),
+              Lambda("product", {
+                product: Select("ref", Var("product")),
+                quantity: Select("requestedQuantity", Var("product")),
+                price: Select("price", Var("product"))
+              })
+            )
+          },
+          Create(Collection("orders"), {
+            data: {
+              customer: Select("ref", Var("customer")),
+              cart: Var("shoppingCart"),
+              status: "processing",
+              creationDate: Time("now"),
+              shipDate: null,
+              deliveryAddress: Select(["data", "address"], Var("customer")),
+              creditCard: Select(["data", "creditCard"], Var("customer"))
+            }
+          })
+        )
+      )
+    )
+  )
