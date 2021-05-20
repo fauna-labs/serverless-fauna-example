@@ -1,0 +1,4 @@
+Lambda("ref", Equals(
+  CurrentIdentity(),
+  Select(["data", "customer"], Get(Var("ref")))
+))

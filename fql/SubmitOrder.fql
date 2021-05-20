@@ -3,7 +3,7 @@ Lambda(
     ["customerId", "products"],
     Let(
       {
-        customer: Get(Ref(Collection("customers"), Var("customerId"))),
+        customer: Get(Var("customerId")),
         products: Map(
           Var("products"),
           Lambda(

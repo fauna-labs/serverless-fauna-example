@@ -35,12 +35,18 @@ const SortByPrice = (order) =>
       : 'products_by_price_high_to_low'
   )
 
-module.exports.list = async ({ queryStringParameters = {} }) => {
-  const { storeId, customerId, priceSort } = queryStringParameters
+module.exports.list = async (event) => {
+  const { storeId, customerId, priceSort } = event.queryStringParameters || {}
 
   const Match = GetMatch({ storeId, customerId })
   const MatchAndSort = priceSort ? q.Join(Match, SortByPrice(priceSort)) : Match
   const MapLambda = priceSort ? (_, ref) => q.Get(ref) : (ref) => q.Get(ref)
 
-  return client.query(q.Map(q.Paginate(MatchAndSort), MapLambda))
+  return client
+    .query(q.Map(q.Paginate(MatchAndSort), MapLambda))
+    .then((body) => ({ statusCode: 200, body: JSON.stringify(body) }))
+    .catch((error) => ({
+      statusCode: error.requestResult.statusCode,
+      body: error.requestResult.responseRaw,
+    }))
 }

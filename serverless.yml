@@ -7,16 +7,17 @@ provider:
   name: aws
   runtime: nodejs12.x
   lambdaHashingVersion: 20201221
+  environment:
+    FAUNA_SECRET: ${self:fauna.client.secret}
 
 plugins:
   - serverless-fauna
 functions:
   seed:
     handler: functions/seed.seed
-    environment:
-      FAUNA_SECRET: ${self:fauna.client.secret}
-  list_products:
-    handler: functions/listProducts.list
+
+  listProducts:
+    handler: functions/list_products.list
     events:
       - http:
           method: get
@@ -27,9 +28,55 @@ functions:
               querystrings:
                 priceSort: false
                 customerId: false
-                storeId: false   
-    environment:
-      FAUNA_SECRET: ${self:fauna.client.secret}
+                storeId: false  
+
+  register:
+    handler: functions/register.create
+    events:
+      - http:
+          method: post
+          path: /customers
+          cors: true
+          request:
+            schemas:
+              application/json: ${file(./jsonSchemas/register.json)}
+        
+  login:
+    handler: functions/login.login
+    events:
+      - http:
+          method: post
+          path: /customers/login
+          cors: true
+          request:
+            schemas:
+              application/json: ${file(./jsonSchemas/login.json)}
+
+  submit_order:
+    handler: functions/submit_order.submit
+    events:
+      - http:
+          method: post
+          path: /orders
+          cors: true
+          request:
+            parameters:
+              headers:
+                secret: true
+            schemas:
+              application/json: ${file(./jsonSchemas/submit_order.json)}
+    
+  customer_orders:
+    handler: functions/customer_orders.list
+    events:
+      - http:
+          method: get
+          path: /orders
+          cors: true
+          request:
+            parameters:
+              headers:
+                secret: true
 
 
 fauna:
@@ -56,6 +103,13 @@ fauna:
       name: stores
 
   indexes:
+    orders_by_customer:
+      name: orders_by_customer
+      source: ${self:fauna.collections.orders.name}
+      terms:
+        fields: 
+          - data.customer
+
     products_by_customer:
       # can accept any param that accept CreateIndex query except source.fields
       # Read more https://docs.fauna.com/fauna/current/api/fql/functions/createindex?lang=javascript#param_object
@@ -76,19 +130,6 @@ fauna:
           - data.store
       values:
         fields:
-          - ref
-
-    inventory_by_product:
-      name: inventory_by_product
-      source: ${self:fauna.collections.products.name}
-      terms:
-        fields:
-          - data.name
-      values:
-        fields:
-          - path: data.quantity
-            reverse: true
-          - data.description
           - ref
 
     products_by_price_high_to_low:
@@ -113,6 +154,15 @@ fauna:
         fields:
           - data.price
           - ref 
+    
+    customer_by_email:
+      name: customer_by_email
+      source: ${self:fauna.collections.customers.name}
+      data:
+        deletion_policy: retain
+      terms:
+        fields:
+          - data.email
 
     all_orders:
       name: all_orders   
@@ -133,38 +183,23 @@ fauna:
   functions:
     submit_order:
       name: submit_order
-      body: ${file('./submit_order.fql')}
+      body: ${file('./fql/SubmitOrder.fql')}
+      role: admin
 
 
-  # roles:
-  #   movies_reader:
-  #     # can accept any param that accept CreateRole query except source.fields
-  #     # Read more https://docs.fauna.com/fauna/current/api/fql/functions/createrole?lang=javascript
-  #     name: movies_reader
-  #     membership:
-  #       resource: ${self:fauna.collections.users.name}
-  #       predicate: ${file(./IsActiveUser.fql)}
-  #     privileges:
-  #       - collection: ${self:fauna.collections.movies.name}
-  #         actions:
-  #           read: true
-  #       - index: ${self:fauna.indexes.movies_by_type.name}
-  #         actions:
-  #           read: true
-  #       - index: ${self:fauna.indexes.movies_by_category.name}
-  #         actions:
-  #           read: true
-  #       - index: ${self:fauna.indexes.sort_by_year.name}
-  #         actions:
-  #           read: true
-
-  #   editors:
-  #     name: editors
-  #     membership:
-  #       - ${self:fauna.collections.scriptwriters.name}
-  #       - ${self:fauna.collections.directors.name}
-  #     privileges:
-  #       - collection: ${self:fauna.collections.movies.name}
-  #         actions:
-  #           read: true
-  #           write: ${file(./CanModifyMovie.fql)}
+  roles:
+    customer:
+      # can accept any param that accept CreateRole query except source.fields
+      # Read more https://docs.fauna.com/fauna/current/api/fql/functions/createrole?lang=javascript
+      name: customer
+      membership: ${self:fauna.collections.customers.name}
+      privileges:
+        - function: ${self:fauna.functions.submit_order.name}
+          actions:
+            call: true
+        - index: ${self:fauna.indexes.orders_by_customer.name}
+          actions:
+            read: true
+        - collection: ${self:fauna.collections.orders.name}
+          actions:
+            read: true
