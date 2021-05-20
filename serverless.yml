@@ -202,4 +202,4 @@ fauna:
             read: true
         - collection: ${self:fauna.collections.orders.name}
           actions:
-            read: true
+            read: ${file('./fql/Owner.fql')}
