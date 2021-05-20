@@ -4,16 +4,17 @@
 [Serverless Fauna plugin](https://github.com/fauna/serverless-fauna/)
 [Fauna get started](https://docs.fauna.com/fauna/current/start/)
 
-## Before start
-- Install dependency
-- Create Fauna root secret and save it to serverless params under the key `FAUNA_ROOT_KEY`
-or replace line 84 at serverless.yml
-
 ## Structure
 - `fql` - *.fql queries that uses at the serverless.yml configuration
 - `functions` - AWS Lambda's
 - `jsonSchemas` - uses to specify request shape for AWS Gateway at serverless.yml
 - `seed` - demo data
+
+## Before start
+- Install dependency
+- Create Fauna root secret and save it to serverless params under the key `FAUNA_ROOT_KEY`
+or replace line 84 at serverless.yml
+- run command to seed demo data `sls invoke local -f list_products`
 
 
 ## Deploy to cloud
