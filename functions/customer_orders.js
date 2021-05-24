@@ -5,7 +5,9 @@ module.exports.list = async (event) => {
   return new fauna.Client({ secret: event.headers.secret })
     .query(
       q.Map(
-        q.Paginate(q.Match(q.Index('orders_by_customer'), q.CurrentIdentity())),
+        q.Paginate(
+          q.Match(q.Index(process.env.orders_by_customer), q.CurrentIdentity())
+        ),
         (ref) => q.Get(ref)
       )
     )

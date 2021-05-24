@@ -16,7 +16,7 @@ functions:
   seed:
     handler: functions/seed.seed
 
-  listProducts:
+  list_products:
     handler: functions/list_products.list
     events:
       - http:
@@ -29,6 +29,14 @@ functions:
                 priceSort: false
                 customerId: false
                 storeId: false  
+    environment:
+      products_by_store: ${self:fauna.indexes.products_by_store.name}
+      products_by_customer: ${self:fauna.indexes.products_by_customer.name}
+      all_products: ${self:fauna.indexes.all_products.name}
+      products_by_price_low_to_high: ${self:fauna.indexes.products_by_price_low_to_high.name}
+      products_by_price_high_to_low: ${self:fauna.indexes.products_by_price_high_to_low.name}
+      stores: ${self:fauna.collections.stores.name}
+      customers: ${self:fauna.collections.customers.name}
 
   register:
     handler: functions/register.create
@@ -40,6 +48,9 @@ functions:
           request:
             schemas:
               application/json: ${file(./jsonSchemas/register.json)}
+    environment:
+      customer_by_email: ${self:fauna.indexes.customer_by_email.name}
+      customers: ${self:fauna.collections.customers.name}
         
   login:
     handler: functions/login.login
@@ -51,6 +62,8 @@ functions:
           request:
             schemas:
               application/json: ${file(./jsonSchemas/login.json)}
+    environment:
+      customer_by_email: ${self:fauna.indexes.customer_by_email.name}
 
   submit_order:
     handler: functions/submit_order.submit
@@ -65,6 +78,8 @@ functions:
                 secret: true
             schemas:
               application/json: ${file(./jsonSchemas/submit_order.json)}
+    environment:
+      submit_order: ${self:fauna.functions.submit_order.name}
     
   customer_orders:
     handler: functions/customer_orders.list
@@ -77,6 +92,8 @@ functions:
             parameters:
               headers:
                 secret: true
+    environment:
+      orders_by_customer: ${self:fauna.indexes.orders_by_customer.name}
 
 
 fauna:

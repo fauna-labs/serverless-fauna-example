@@ -8,9 +8,12 @@ module.exports.create = async (event) => {
   return client
     .query(
       q.If(
-        q.Exists(q.Match(q.Index('customer_by_email'), data.email)),
+        q.Exists(q.Match(q.Index(process.env.customer_by_email), data.email)),
         q.Abort('Email occupied'),
-        q.Create(q.Collection('customers'), { credentials: { password }, data })
+        q.Create(q.Collection(process.env.customers), {
+          credentials: { password },
+          data,
+        })
       )
     )
     .then((body) => ({

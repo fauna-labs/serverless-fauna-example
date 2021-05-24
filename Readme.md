@@ -14,7 +14,7 @@
 - Install dependency
 - Create Fauna root secret and save it to serverless params under the key `FAUNA_ROOT_KEY`
 or replace line 84 at serverless.yml
-- run command to seed demo data `sls invoke local -f list_products`
+- run command to seed demo data `sls invoke local -f seed`
 
 
 ## Deploy to cloud
