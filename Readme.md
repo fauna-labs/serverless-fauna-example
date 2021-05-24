@@ -1,4 +1,8 @@
-# Serverless Fauna plugin usage example
+This repository contains unofficial patterns, sample code, or tools to help developers build more effectively with [Fauna][fauna]. All [Fauna Labs][fauna-labs] repositories are provided “as-is” and without support. By using this repository or its contents, you agree that this repository may never be officially supported and moved to the [Fauna organization][fauna-organization].
+
+---
+
+# Fauna Serverless Framework plugin usage example
 
 [Serverless quick start](https://www.serverless.com/framework/docs/providers/aws/guide/quick-start/)
 [Serverless Fauna plugin](https://github.com/fauna/serverless-fauna/)
@@ -120,3 +124,11 @@ replace `CUSTOMER_SECRET` with secret from `login` response
 ```
 sls invoke local -f customer_orders --data '{"headers": {"secret": "CUSTOMER_SECRET"}}'
 ```
+
+---
+
+Copyright Fauna, Inc. or its affiliates. All rights reserved. SPDX-License-Identifier: MIT-0
+
+[fauna]: https://www.fauna.com/
+[fauna-labs]: https://github.com/fauna-labs
+[fauna-organization]: https://github.com/fauna
