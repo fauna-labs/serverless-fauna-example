@@ -1,10 +1,9 @@
-const fauna = require('faunadb')
-const q = fauna.query
-
-const client = new fauna.Client({ secret: process.env.FAUNA_SECRET })
+const { query: q } = require('faunadb')
+const { client } = require('../db/client')
 
 module.exports.create = async (event) => {
   const { password, ...data } = JSON.parse(event.body)
+
   return client
     .query(
       q.If(

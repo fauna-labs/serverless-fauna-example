@@ -2,6 +2,7 @@ service: serverless-fauna-example
 app: serverless-fauna-example
 org: fireridlle
 configValidationMode: error
+useDotenv: true
 
 provider:
   name: aws
@@ -9,6 +10,9 @@ provider:
   lambdaHashingVersion: 20201221
   environment:
     FAUNA_SECRET: ${self:fauna.client.secret}
+    FAUNA_DOMAIN: ${self:fauna.client.domain}
+    FAUNA_SCHEME: ${self:fauna.client.scheme}
+    FAUNA_PORT: ${self:fauna.client.port}
 
 plugins:
   - serverless-fauna
@@ -25,6 +29,8 @@ functions:
           cors: true
           request:
             parameters:
+              headers:
+                secret: true
               querystrings:
                 priceSort: false
                 customerId: false
@@ -98,10 +104,10 @@ functions:
 
 fauna:
   client:
-    secret: ${param:FAUNA_ROOT_KEY}
-    # domain: db.fauna.com
-    # port: 433
-    # scheme: https
+    secret: ${env:FAUNA_SECRET}
+    domain: ${env:FAUNA_DOMAIN, "db.fauna.com"}
+    scheme: ${env:FAUNA_SCHEME, "https"}
+    port: ${env:FAUNA_PORT, "443"}
   collections:
     customers:
       # can accept any param that accept CreateCollection query. 
@@ -211,12 +217,33 @@ fauna:
       name: customer
       membership: ${self:fauna.collections.customers.name}
       privileges:
-        - function: ${self:fauna.functions.submit_order.name}
+        - collection: ${self:fauna.collections.products.name}
           actions:
-            call: true
-        - index: ${self:fauna.indexes.orders_by_customer.name}
+            read: true
+        - collection: ${self:fauna.collections.stores.name}
           actions:
             read: true
         - collection: ${self:fauna.collections.orders.name}
           actions:
             read: ${file('./fql/Owner.fql')}
+        - index: ${self:fauna.indexes.all_products.name}
+          actions:
+            read: true
+        - index: ${self:fauna.indexes.products_by_store.name}
+          actions:
+            read: true
+        - index: ${self:fauna.indexes.products_by_price_low_to_high.name}
+          actions:
+            read: true
+        - index: ${self:fauna.indexes.products_by_price_high_to_low.name}
+          actions:
+            read: true
+        - index: ${self:fauna.indexes.orders_by_customer.name}
+          actions:
+            read: ${file('./fql/EqualsCurrentIdentityArity1.fql')}
+        - index: ${self:fauna.indexes.products_by_customer.name}
+          actions:
+            read: ${file('./fql/EqualsCurrentIdentityArity1.fql')}
+        - function: ${self:fauna.functions.submit_order.name}
+          actions:
+            call: ${file('./fql/EqualsCurrentIdentityArity2.fql')}

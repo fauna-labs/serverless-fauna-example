@@ -1,15 +1,16 @@
-const fauna = require('faunadb')
-const q = fauna.query
+const { query: q } = require('faunadb')
+const { client } = require('../db/client')
 
-module.exports.list = async (event) => {
-  return new fauna.Client({ secret: event.headers.secret })
+module.exports.list = (event) => {
+  return client
     .query(
       q.Map(
         q.Paginate(
           q.Match(q.Index(process.env.orders_by_customer), q.CurrentIdentity())
         ),
         (ref) => q.Get(ref)
-      )
+      ),
+      { secret: event.headers.secret }
     )
     .then((body) => ({
       statusCode: 200,

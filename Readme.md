@@ -15,11 +15,10 @@ This repository contains unofficial patterns, sample code, or tools to help deve
 - `seed` - demo data
 
 ## Before start
-- Install dependency
-- Create Fauna root secret and save it to serverless params under the key `FAUNA_ROOT_KEY`
-or replace line 84 at serverless.yml
-- run command to seed demo data `sls invoke local -f seed`
-
+- run `npm install` (TODO: Add "serverless-fauna" package in package.json once it's published)
+- copy `.env.sample` file as `.env` and fill up required `FAUNA_SECRET` variable
+- run `sls fauna deploy` to deploy only Fauna resources
+- run  `sls invoke local -f seed` to seed demo data
 
 ## Deploy to cloud
 ```
@@ -74,31 +73,6 @@ In additional to that, serverless will create AWS API Gateway endpoints and Lamb
 
 ## Invoke functions locally
 
-### Return list of all products
-All products
-
-```
-sls invoke local -f list_products
-```
-
-Sort by price
-
-```
-sls invoke local -f list_products --data '{"queryStringParameters": {"priceSort": "low-to-high"}}'
-```
-
-Match by store
-
-```
-sls invoke local -f list_products --data '{"queryStringParameters": {"storeId": "303"}}'
-```
-
-Match by store + customer and sort by price
-
-```
-sls invoke local -f list_products --data '{"queryStringParameters": {"storeId": "303", "customerId": "102","priceSort": "low-to-high"}}'
-```
-
 ### Customer registration
 
 ```
@@ -111,16 +85,42 @@ sls invoke local -f register --data '{"body": "{\"email\":\"test@fauna.com\",\"p
 sls invoke local -f login --data '{"body": "{\"email\":\"test@fauna.com\",\"password\":\"111111\"}"}'
 ```
 
+Use the `secret/id` values as replacements for `CUSTOMER_SECRET/CUSTOMER_ID` placeholders in the next requests.
+
+### Return list of all products
+
+#### All products
+
+```
+sls invoke local -f list_products --data '{"headers": {"secret": "CUSTOMER_SECRET"}}'
+```
+
+#### Sort by price
+
+```
+sls invoke local -f list_products --data '{"queryStringParameters": {"priceSort": "low-to-high"}, "headers": {"secret": "CUSTOMER_SECRET"}}'
+```
+
+#### Match by store
+
+```
+sls invoke local -f list_products --data '{"queryStringParameters": {"storeId": "303"}, "headers": {"secret": "CUSTOMER_SECRET"}}'
+```
+
+#### Match by store + customer and sort by price
+
+```
+sls invoke local -f list_products --data '{"queryStringParameters": {"storeId": "303", "customerId": "CUSTOMER_ID","priceSort": "low-to-high"}, "headers": {"secret": "CUSTOMER_SECRET"}}'
+```
+
 ### Customer purchase product(s)
 
-replace `CUSTOMER_SECRET` with secret from `login` response
 ```
 sls invoke local -f submit_order --data '{"headers": {"secret": "CUSTOMER_SECRET"},"body": "{\"products\":[{\"productId\":\"209\",\"quantity\":1}]}"}'
 ```
 
 ### Return list of customer orders  
 
-replace `CUSTOMER_SECRET` with secret from `login` response
 ```
 sls invoke local -f customer_orders --data '{"headers": {"secret": "CUSTOMER_SECRET"}}'
 ```

@@ -1,10 +1,13 @@
-const fauna = require('faunadb')
-const q = fauna.query
+const { query: q } = require('faunadb')
+const { client } = require('../db/client')
 
 module.exports.submit = async (event) => {
   const { products } = JSON.parse(event.body)
-  return new fauna.Client({ secret: event.headers.secret })
-    .query(q.Call(process.env.submit_order, [q.CurrentIdentity(), products]))
+
+  return client
+    .query(q.Call(process.env.submit_order, [q.CurrentIdentity(), products]), {
+      secret: event.headers.secret,
+    })
     .then((body) => ({
       statusCode: 200,
       body: JSON.stringify(body),

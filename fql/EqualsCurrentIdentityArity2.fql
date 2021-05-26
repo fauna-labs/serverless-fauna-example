@@ -1,0 +1,4 @@
+Lambda(
+  ['ref', '_'],
+  Equals(Var('ref'), CurrentIdentity())
+)
