@@ -5,6 +5,7 @@ module.exports = [
   {
     ref: Ref(Collection('customers'), '101'),
     data: {
+      email: 'alice.appleseed@unknown.com',
       firstName: 'Alice',
       lastName: 'Appleseed',
       address: {
@@ -23,6 +24,7 @@ module.exports = [
   {
     ref: Ref(Collection('customers'), '102'),
     data: {
+      email: 'bob.brown@unknown.com',
       firstName: 'Bob',
       lastName: 'Brown',
       address: {
@@ -41,6 +43,7 @@ module.exports = [
   {
     ref: Ref(Collection('customers'), '103'),
     data: {
+      email: 'carol.clark@unknown.com',
       firstName: 'Carol',
       lastName: 'Clark',
       address: {

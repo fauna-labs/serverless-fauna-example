@@ -1,7 +1,5 @@
-const fauna = require('faunadb')
-const q = fauna.query
-
-const client = new fauna.Client({ secret: process.env.FAUNA_SECRET })
+const { query: q } = require('faunadb')
+const { client } = require('../db/client')
 
 const MatchByStore = (storeId) =>
   q.Match(
@@ -46,8 +44,13 @@ module.exports.list = async (event) => {
   const MapLambda = priceSort ? (_, ref) => q.Get(ref) : (ref) => q.Get(ref)
 
   return client
-    .query(q.Map(q.Paginate(MatchAndSort), MapLambda))
-    .then((body) => ({ statusCode: 200, body: JSON.stringify(body) }))
+    .query(q.Map(q.Paginate(MatchAndSort), MapLambda), {
+      secret: event.headers.secret,
+    })
+    .then((body) => ({
+      statusCode: 200,
+      body: JSON.stringify(body),
+    }))
     .catch((error) => ({
       statusCode: error.requestResult.statusCode,
       body: error.requestResult.responseRaw,
