@@ -1,17 +1,37 @@
 {
-  "name": "serverless-fauna",
-  "version": "1.0.0",
-  "description": "Serverless fauna plugin",
-  "main": "index.js",
+  "name": "serverless-fauna-example",
+  "version": "0.1.0",
+  "description": "A sample application demonstrating how to use the Fauna plugin for the Serverless Framework.",
+  "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "dependencies": {
-    "faunadb": "4.x",
-    "serverless": "2.x"
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fauna-labs/serverless-fauna-example.git"
   },
+  "keywords": [
+    "Fauna",
+    "Serverless",
+    "Framework",
+    "serverless",
+    "plugin",
+    "database"
+  ],
+  "author": "Fauna Inc.",
   "engines": {
     "node": ">=12.0"
   },
-  "license": "MIT"
+  "license": "MIT-0",
+  "bugs": {
+    "url": "https://github.com/fauna-labs/serverless-fauna-example/issues"
+  },
+  "homepage": "https://github.com/fauna-labs/serverless-fauna-example#readme",
+  "dependencies": {
+    "faunadb": "^4.3.0",
+    "serverless": "2.x"
+  },
+  "devDependencies": {
+    "serverless-fauna": "^0.1.0"
+  }
 }

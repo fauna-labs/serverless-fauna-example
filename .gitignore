@@ -5,5 +5,9 @@ jspm_packages
 # Serverless directories
 .serverless
 
+# dotenv files (natively supported by Serverless Framework)
 .env
-.idea
+
+# IDE settings
+.idea/
+.vscode/

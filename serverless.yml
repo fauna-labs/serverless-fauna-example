@@ -1,8 +1,13 @@
+# Copyright Fauna, Inc.
+# SPDX-License-Identifier: MIT-0
+
 service: serverless-fauna-example
-app: serverless-fauna-example
-org: fireridlle
 configValidationMode: error
 useDotenv: true
+
+## If you use Serverless Framework Pro, uncomment the following two lines and replace with your app name and org.
+# app: <Replace with your app name>
+# org: <Replace with your org>
 
 provider:
   name: aws
@@ -16,6 +21,7 @@ provider:
 
 plugins:
   - serverless-fauna
+
 functions:
   seed:
     handler: functions/seed.seed
@@ -103,17 +109,28 @@ functions:
 
 
 fauna:
+  # The following declarations create the same collections, indexes, roles, and functions that
+  # are created if you select "Pre-populate with demo data" when creating a new database in the
+  # Fauna dashboard (https://dashboard.fauna.com).
+  # 
+  # To populate the collections with the same demo data, deploy this application,
+  # then invoke the `seed` function:
+  #   serverless deploy
+  #   serverless invoke --function seed
   client:
     secret: ${env:FAUNA_SECRET}
     domain: ${env:FAUNA_DOMAIN, "db.fauna.com"}
     scheme: ${env:FAUNA_SCHEME, "https"}
     port: ${env:FAUNA_PORT, "443"}
   collections:
+    # Collections accept any parameter that CreateCollection() accepts.
+    # For more details on CreateCollection(), read https://docs.fauna.com/fauna/current/api/fql/functions/createcollection?lang=javascript#param_object
     customers:
-      # can accept any param that accept CreateCollection query. 
-      # Read more https://docs.fauna.com/fauna/current/api/fql/functions/createcollection?lang=javascript#param_object
       name: customers
       data:
+        # Setting 'deletion_policy' to 'retain' leaves a resource intact if the entire application is removed with `serverless remove`.
+        # Typically you would set this to 'retain' for a production environment and leave it unset for environments that are
+        # frequently created and destroyed.
         deletion_policy: retain
 
     orders:
@@ -126,6 +143,8 @@ fauna:
       name: stores
 
   indexes:
+    # Indexes accept any parameter that CreateIndex() accepts
+    # For more details on CreateIndex(), read https://docs.fauna.com/fauna/current/api/fql/functions/createindex?lang=javascript#param_object
     orders_by_customer:
       name: orders_by_customer
       source: ${self:fauna.collections.orders.name}
@@ -134,8 +153,6 @@ fauna:
           - data.customer
 
     products_by_customer:
-      # can accept any param that accept CreateIndex query except source.fields
-      # Read more https://docs.fauna.com/fauna/current/api/fql/functions/createindex?lang=javascript#param_object
       name: products_by_customer
       source: ${self:fauna.collections.orders.name}
       terms:
@@ -211,9 +228,9 @@ fauna:
 
 
   roles:
+    # Roles accept any parameter that CreateRole() accepts
+    # For more details on CreateRole(), read https://docs.fauna.com/fauna/current/api/fql/functions/createrole?lang=javascript
     customer:
-      # can accept any param that accept CreateRole query except source.fields
-      # Read more https://docs.fauna.com/fauna/current/api/fql/functions/createrole?lang=javascript
       name: customer
       membership: ${self:fauna.collections.customers.name}
       privileges:
