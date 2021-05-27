@@ -134,7 +134,6 @@ fauna:
           - data.customer
 
     products_by_customer:
-      # can accept any param that accept CreateIndex query except source.fields
       # Read more https://docs.fauna.com/fauna/current/api/fql/functions/createindex?lang=javascript#param_object
       name: products_by_customer
       source: ${self:fauna.collections.orders.name}
@@ -212,7 +211,6 @@ fauna:
 
   roles:
     customer:
-      # can accept any param that accept CreateRole query except source.fields
       # Read more https://docs.fauna.com/fauna/current/api/fql/functions/createrole?lang=javascript
       name: customer
       membership: ${self:fauna.collections.customers.name}
