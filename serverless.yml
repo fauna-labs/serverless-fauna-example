@@ -20,7 +20,7 @@ provider:
     FAUNA_PORT: ${self:fauna.client.port}
 
 plugins:
-  - serverless-fauna
+  - "@fauna-labs/serverless-fauna"
 
 functions:
   seed:

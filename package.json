@@ -1,5 +1,5 @@
 {
-  "name": "serverless-fauna-example",
+  "name": "@fauna-labs/serverless-fauna-example",
   "version": "0.1.0",
   "description": "A sample application demonstrating how to use the Fauna plugin for the Serverless Framework.",
   "main": "app.js",
@@ -12,8 +12,7 @@
   },
   "keywords": [
     "Fauna",
-    "Serverless",
-    "Framework",
+    "Serverless Framework",
     "serverless",
     "plugin",
     "database"
@@ -32,6 +31,6 @@
     "serverless": "2.x"
   },
   "devDependencies": {
-    "serverless-fauna": "^0.1.0"
+    "@fauna-labs/serverless-fauna": "^0.1.0"
   }
 }
