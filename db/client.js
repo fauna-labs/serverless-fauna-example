@@ -1,3 +1,6 @@
+// Copyright Fauna, Inc.
+// SPDX-License-Identifier: MIT-0
+
 const { Client } = require('faunadb')
 
 module.exports.client = new Client({

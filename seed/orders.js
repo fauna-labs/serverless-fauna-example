@@ -1,3 +1,6 @@
+// Copyright Fauna, Inc.
+// SPDX-License-Identifier: MIT-0
+
 const fauna = require('faunadb')
 const { Ref, Collection, Time } = fauna.query
 
