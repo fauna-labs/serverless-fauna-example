@@ -1,6 +1,3 @@
-// Copyright Fauna, Inc.
-// SPDX-License-Identifier: MIT-0
-
 Lambda("ref", Equals(
   CurrentIdentity(),
   Select(["data", "customer"], Get(Var("ref")))

@@ -28,7 +28,7 @@
   "homepage": "https://github.com/fauna-labs/serverless-fauna-example#readme",
   "dependencies": {
     "faunadb": "^4.3.0",
-    "serverless": "2.x"
+    "serverless": "^2.46.0"
   },
   "devDependencies": {
     "@fauna-labs/serverless-fauna": "^0.1.0"
