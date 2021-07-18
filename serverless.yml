@@ -223,7 +223,7 @@ fauna:
   functions:
     submit_order:
       name: submit_order
-      body: ${file('./fql/SubmitOrder.fql')}
+      body: ${file(./fql/SubmitOrder.fql)}
       role: admin
 
 
@@ -242,7 +242,7 @@ fauna:
             read: true
         - collection: ${self:fauna.collections.orders.name}
           actions:
-            read: ${file('./fql/Owner.fql')}
+            read: ${file(./fql/Owner.fql)}
         - index: ${self:fauna.indexes.all_products.name}
           actions:
             read: true
@@ -257,10 +257,10 @@ fauna:
             read: true
         - index: ${self:fauna.indexes.orders_by_customer.name}
           actions:
-            read: ${file('./fql/EqualsCurrentIdentityArity1.fql')}
+            read: ${file(./fql/EqualsCurrentIdentityArity1.fql)}
         - index: ${self:fauna.indexes.products_by_customer.name}
           actions:
-            read: ${file('./fql/EqualsCurrentIdentityArity1.fql')}
+            read: ${file(./fql/EqualsCurrentIdentityArity1.fql)}
         - function: ${self:fauna.functions.submit_order.name}
           actions:
-            call: ${file('./fql/EqualsCurrentIdentityArity2.fql')}
+            call: ${file(./fql/EqualsCurrentIdentityArity2.fql)}
